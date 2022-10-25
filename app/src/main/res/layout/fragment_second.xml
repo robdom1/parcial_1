@@ -10,18 +10,86 @@
         android:id="@+id/textview_second"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/button_second"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/button_second"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/previous"
+    <ImageButton
+        android:id="@+id/btnLimpiar"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="32dp"
+        android:backgroundTint="?attr/colorPrimary"
+        android:src="@android:drawable/ic_delete"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnGuardar"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/precioArticulo"
+        app:tint="?android:attr/textColorPrimary" />
+
+    <ImageButton
+        android:id="@+id/btnGuardar"
+        android:layout_width="96dp"
+        android:layout_height="0dp"
+        android:backgroundTint="?attr/colorPrimary"
+        android:src="@android:drawable/ic_input_add"
+        app:layout_constraintBottom_toBottomOf="@+id/btnLimpiar"
+        app:layout_constraintEnd_toStartOf="@+id/btnRegresar"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btnLimpiar"
+        app:layout_constraintTop_toTopOf="@+id/btnLimpiar"
+        app:tint="?android:attr/textColorPrimary" />
+
+    <ImageButton
+        android:id="@+id/btnRegresar"
+        android:layout_width="96dp"
+        android:layout_height="0dp"
+        android:backgroundTint="?attr/colorPrimary"
+        android:src="?attr/actionModeSelectAllDrawable"
+        app:layout_constraintBottom_toBottomOf="@+id/btnGuardar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btnGuardar"
+        app:layout_constraintTop_toTopOf="@+id/btnGuardar"
+        app:tint="?android:attr/textColorPrimary" />
+
+    <EditText
+        android:id="@+id/inputNombre"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        android:ems="10"
+        android:hint="@string/nombre_msg"
+        android:inputType="textCapSentences"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textview_second" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/inputDescripcion"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="24dp"
+        android:ems="10"
+        android:hint="@string/descripcion_msg"
+        android:inputType="textCapSentences"
+        app:layout_constraintEnd_toEndOf="@+id/inputNombre"
+        app:layout_constraintStart_toStartOf="@+id/inputNombre"
+        app:layout_constraintTop_toBottomOf="@+id/inputNombre" />
+
+    <EditText
+        android:id="@+id/inputPrecio"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="24dp"
+        android:ems="10"
+        android:hint="@string/precio_msg"
+        android:inputType="numberDecimal"
+        app:layout_constraintEnd_toEndOf="@+id/inputDescripcion"
+        app:layout_constraintStart_toStartOf="@+id/inputDescripcion"
+        app:layout_constraintTop_toBottomOf="@+id/inputDescripcion" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -15,13 +15,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.parcial_1.databinding.FragmentFirstBinding;
 import com.example.parcial_1.entities.Producto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FirstFragment extends Fragment {
 
     private FragmentFirstBinding binding;
-
-    public static List<Producto> productos;
 
     @Override
     public View onCreateView(
@@ -40,16 +39,11 @@ public class FirstFragment extends Fragment {
         }
 
         recyclerView.setHasFixedSize(true);
-        //recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recyclerView.setLayoutManager(new GridLayoutManager(container.getContext(), spanCount));
 
-        productos.add(new Producto("test", "test", 100.00));
-        productos.add(new Producto("test2", "test2", 200.00));
-        productos.add(new Producto("test3", "test3", 300.00));
-        productos.add(new Producto("test4", "test4", 400.00));
-        productos.add(new Producto("test5", "test5", 500.00));
 
-        recyclerView.setAdapter(new ItemAdapter());
+
+        recyclerView.setAdapter(new ItemAdapter(container.getContext()));
 
         return binding.getRoot();
 
@@ -66,6 +60,8 @@ public class FirstFragment extends Fragment {
             }
         });
     }
+
+
 
     @Override
     public void onDestroyView() {
