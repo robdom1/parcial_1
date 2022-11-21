@@ -5,15 +5,20 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.parcial_1.databinding.FragmentFirstBinding;
 import com.example.parcial_1.entities.Producto;
+import com.example.parcial_1.viewmodels.ProductViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +26,8 @@ import java.util.List;
 public class FirstFragment extends Fragment {
 
     private FragmentFirstBinding binding;
+    private ProductViewModel productViewModel;
+    private RecyclerView recyclerView;
 
     @Override
     public View onCreateView(
@@ -30,7 +37,7 @@ public class FirstFragment extends Fragment {
 
         binding = FragmentFirstBinding.inflate(inflater, container, false);
 
-        RecyclerView recyclerView = binding.recyclerView;
+        recyclerView = binding.recyclerView;
 
         int spanCount = 1;
 
@@ -43,7 +50,7 @@ public class FirstFragment extends Fragment {
 
 
 
-        recyclerView.setAdapter(new ItemAdapter(container.getContext()));
+        recyclerView.setAdapter(new ItemAdapter(this));
 
         return binding.getRoot();
 
@@ -51,6 +58,16 @@ public class FirstFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        ItemAdapter adapter = (ItemAdapter) recyclerView.getAdapter();
+        productViewModel = new ViewModelProvider(this).get(ProductViewModel.class);
+
+        productViewModel.getAllProducts().observe(getViewLifecycleOwner(), new Observer<List<Producto>>() {
+            @Override
+            public void onChanged(List<Producto> productos) {
+                adapter.setList(productos);
+            }
+        });
 
         binding.fab.setOnClickListener(new View.OnClickListener() {
             @Override

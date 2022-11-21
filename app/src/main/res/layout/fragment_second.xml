@@ -14,60 +14,57 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageButton
+    <Button
         android:id="@+id/btnLimpiar"
         android:layout_width="96dp"
-        android:layout_height="96dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="32dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
         android:backgroundTint="?attr/colorPrimary"
-        android:src="@android:drawable/ic_delete"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="clear"
         app:layout_constraintEnd_toStartOf="@+id/btnGuardar"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/precioArticulo"
-        app:tint="?android:attr/textColorPrimary" />
+        app:layout_constraintTop_toBottomOf="@+id/inputPrecio" />
 
-    <ImageButton
+    <Button
         android:id="@+id/btnGuardar"
         android:layout_width="96dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:backgroundTint="?attr/colorPrimary"
-        android:src="@android:drawable/ic_input_add"
+        android:text="save"
         app:layout_constraintBottom_toBottomOf="@+id/btnLimpiar"
-        app:layout_constraintEnd_toStartOf="@+id/btnRegresar"
+        app:layout_constraintEnd_toStartOf="@+id/btnDelete"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btnLimpiar"
-        app:layout_constraintTop_toTopOf="@+id/btnLimpiar"
-        app:tint="?android:attr/textColorPrimary" />
+        app:layout_constraintTop_toTopOf="@+id/btnLimpiar" />
 
-    <ImageButton
-        android:id="@+id/btnRegresar"
+    <Button
+        android:id="@+id/btnDelete"
         android:layout_width="96dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:backgroundTint="?attr/colorPrimary"
-        android:src="?attr/actionModeSelectAllDrawable"
+        android:text="delete"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/btnGuardar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btnGuardar"
         app:layout_constraintTop_toTopOf="@+id/btnGuardar"
-        app:tint="?android:attr/textColorPrimary" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <EditText
         android:id="@+id/inputNombre"
         android:layout_width="0dp"
         android:layout_height="64dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
         android:ems="10"
         android:hint="@string/nombre_msg"
         android:inputType="textCapSentences"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/vistaImagen" />
 
     <EditText
         android:id="@+id/inputDescripcion"
@@ -92,4 +89,14 @@
         app:layout_constraintEnd_toEndOf="@+id/inputDescripcion"
         app:layout_constraintStart_toStartOf="@+id/inputDescripcion"
         app:layout_constraintTop_toBottomOf="@+id/inputDescripcion" />
+
+    <ImageView
+        android:id="@+id/vistaImagen"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/textview_second"
+        app:srcCompat="@drawable/ic_baseline_image_search_24" />
 </androidx.constraintlayout.widget.ConstraintLayout>

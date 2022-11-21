@@ -12,4 +12,5 @@
     <string name="descripcion_msg">Descripción</string>
     <string name="nombre_msg">Artículo</string>
     <string name="precio_msg">Precio</string>
+    <string name="edit_btn">edit</string>
 </resources>

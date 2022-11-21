@@ -3,12 +3,15 @@ package com.example.parcial_1;
 import android.os.Bundle;
 
 import com.example.parcial_1.entities.Producto;
+import com.example.parcial_1.viewmodels.ProductViewModel;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.View;
 
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -19,6 +22,7 @@ import com.example.parcial_1.databinding.ActivityMainBinding;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +32,6 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
 
-    public static List<Producto> productos;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,13 +40,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.toolbar);
-
-        productos = new ArrayList<>();
-        productos.add(new Producto("test", "test", 100.00));
-        productos.add(new Producto("test2", "test2", 200.00));
-        productos.add(new Producto("test3", "test3", 300.00));
-        productos.add(new Producto("test4", "test4", 400.00));
-        productos.add(new Producto("test5", "test5", 500.00));
 
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();

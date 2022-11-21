@@ -5,9 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="16dp"
-    android:backgroundTint="?android:attr/colorForeground"
+    android:backgroundTint="?attr/cardBackgroundColor"
     app:cardBackgroundColor="@color/black"
-    app:cardCornerRadius="24dp">
+    app:cardCornerRadius="24dp"
+    app:cardElevation="24dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/ConstraintLayout"
@@ -16,64 +17,129 @@
 
         <TextView
             android:id="@+id/nombreArticulo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="bottom|start"
+            android:lines="3"
             android:text="TextView"
-            android:textColor="?attr/colorOnPrimary"
+            android:textColor="?attr/colorOnSecondary"
             android:textSize="34sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
         <TextView
             android:id="@+id/descripcionArticulo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="bottom|start"
             android:text="TextView"
-            android:textColor="?attr/colorOnPrimary"
+            android:textColor="?attr/colorOnSecondary"
             android:textSize="24sp"
-            app:layout_constraintStart_toStartOf="@+id/nombreArticulo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/nombreArticulo" />
 
         <TextView
             android:id="@+id/precioArticulo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="165dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="bottom|start"
             android:text="TextView"
-            android:textColor="?attr/colorOnPrimary"
-            android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="@+id/descripcionArticulo"
-            app:layout_constraintTop_toBottomOf="@id/descripcionArticulo" />
-
-        <ImageButton
-            android:id="@+id/btnCompartir"
-            android:layout_width="96dp"
-            android:layout_height="0dp"
-            android:backgroundTint="?attr/colorPrimary"
-            android:src="?attr/actionModeShareDrawable"
-            app:layout_constraintBottom_toBottomOf="@+id/btnBorrar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/btnBorrar"
-            app:layout_constraintTop_toTopOf="@+id/btnBorrar"
-            app:tint="?android:attr/textColorPrimary" />
-
-        <ImageButton
-            android:id="@+id/btnBorrar"
-            android:layout_width="96dp"
-            android:layout_height="64dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="32dp"
-            android:backgroundTint="?attr/colorPrimary"
-            android:src="@android:drawable/ic_delete"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btnCompartir"
+            android:textColor="?attr/colorOnSecondary"
+            android:textSize="24sp"
+            app:layout_constraintEnd_toStartOf="@+id/add_to_cart_btn"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/precioArticulo"
-            app:tint="?android:attr/textColorPrimary" />
+            app:layout_constraintTop_toBottomOf="@id/descripcionArticulo" />
+
+        <Button
+            android:id="@+id/edit_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:padding="0dp"
+            android:paddingLeft="0dp"
+            android:paddingTop="0dp"
+            android:paddingRight="0dp"
+            android:paddingBottom="0dp"
+            android:text="@string/edit_btn"
+            android:textColor="?attr/colorOnSecondary"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/precioArticulo" />
+
+        <Button
+            android:id="@+id/add_to_cart_btn"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:padding="0dp"
+            android:paddingLeft="0dp"
+            android:paddingTop="0dp"
+            android:paddingRight="0dp"
+            android:paddingBottom="0dp"
+            android:text="Add to cart"
+            android:textColor="?attr/colorOnSecondary"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@+id/precioArticulo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/precioArticulo"
+            app:layout_constraintTop_toTopOf="@+id/precioArticulo" />
+
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintEnd_toEndOf="@+id/precioArticulo"
+            app:layout_constraintStart_toStartOf="@+id/precioArticulo"
+            app:layout_constraintTop_toBottomOf="@+id/precioArticulo" />
+
+        <View
+            android:id="@+id/divider3"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintEnd_toEndOf="@+id/descripcionArticulo"
+            app:layout_constraintStart_toStartOf="@+id/descripcionArticulo"
+            app:layout_constraintTop_toBottomOf="@+id/descripcionArticulo" />
+
+        <View
+            android:id="@+id/divider4"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintEnd_toEndOf="@+id/nombreArticulo"
+            app:layout_constraintStart_toStartOf="@+id/nombreArticulo"
+            app:layout_constraintTop_toBottomOf="@+id/nombreArticulo" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="350dp"
+            android:layout_height="200dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.666"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_baseline_image_24" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
