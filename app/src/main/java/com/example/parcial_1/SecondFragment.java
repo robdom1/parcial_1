@@ -85,6 +85,31 @@ public class SecondFragment extends Fragment {
             binding.btnDelete.setVisibility(View.VISIBLE);
         }
 
+        binding.btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                builder.setTitle("Validación");
+                builder.setMessage("Desea eliminar este artículo?")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                delete();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                //  Action for 'NO' Button
+                                dialog.cancel();
+                            }
+                        });
+                //Creating dialog box
+                builder.create().show();
+
+
+            }
+        });
+
 
 //        binding.btnRegresar.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -116,7 +141,7 @@ public class SecondFragment extends Fragment {
                                         Toast.makeText(v.getContext(), "clicked 3", Toast.LENGTH_SHORT).show();
                                         break;
                                     case 3:
-                                        Toast.makeText(v.getContext(), "clicked 4", Toast.LENGTH_SHORT).show();
+                                        dialog.cancel();
                                         break;
                                 }
                             }
@@ -163,6 +188,10 @@ public class SecondFragment extends Fragment {
 
                 save(view, item);
 
+                if(!isEditing){
+                    clearInputs();
+                }
+
 //                MainActivity.productos.add(nuevoProducto);
 
 
@@ -174,7 +203,7 @@ public class SecondFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK && data != null){
+        if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK){
             File f = new File(currentPhotoPath);
             binding.vistaImagen.setImageURI(Uri.fromFile(f));
         }
@@ -186,7 +215,7 @@ public class SecondFragment extends Fragment {
         binding = null;
     }
 
-    public void save(View view, Producto newProduct){
+    private void save(View view, Producto newProduct){
 
         if(isEditing){
             productViewModel.update(newProduct);
@@ -200,15 +229,26 @@ public class SecondFragment extends Fragment {
 
     }
 
-    public void clearInputs(){
+
+
+    private void clearInputs(){
         binding.inputNombre.setText("");
         binding.inputDescripcion.setText("");
         binding.inputPrecio.setText("");
 
         binding.inputNombre.requestFocus();
 
+
         binding.btnDelete.setVisibility(View.GONE);
 
+    }
+
+    private void delete(){
+        productViewModel.delete(item);
+        item = new Producto();
+        clearInputs();
+        Toast.makeText(getContext(),"El artículo fue eliminado", Toast.LENGTH_SHORT).show();
+        isEditing = false;
     }
 
     private File createImageFile() throws IOException {
