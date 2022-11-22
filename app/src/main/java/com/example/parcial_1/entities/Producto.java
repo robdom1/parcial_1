@@ -16,17 +16,28 @@ public class Producto implements Serializable {
     private String nombre;
     private String descripcion;
     private Double precio;
+    private String imageUrl;
 
     public Producto(String nombre, String descripcion, Double precio) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precio = precio;
+        this.imageUrl="";
     }
 
     public Producto(){
         this.nombre = "";
         this.descripcion = "";
         this.precio = null;
+        this.imageUrl="";
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public Long getId() {

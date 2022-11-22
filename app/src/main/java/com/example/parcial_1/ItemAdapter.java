@@ -3,11 +3,13 @@ package com.example.parcial_1;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,11 +17,13 @@ import androidx.annotation.NonNull;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.parcial_1.entities.Producto;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.sql.StatementEvent;
 
@@ -61,6 +65,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         String precioStr = df.format(productoActual.getPrecio());
         holder.precio.setText(precioStr);
 
+        if(!Objects.equals(productoActual.getImageUrl(), "")){
+            Glide.with(mContext).load(productoActual.getImageUrl()).into(holder.imageView);
+        }
+
         holder.btnEditar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,6 +79,12 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
             }
         });
 
+        holder.imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("RecyclerView", "onClick: " + productList.get(holder.getAdapterPosition()).getImageUrl());
+            }
+        });
         holder.btnAddToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,6 +127,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         TextView precio;
         Button btnEditar;
         Button btnAddToCart;
+        ImageView imageView;
 //        ImageButton btnEliminar;
 //        ImageButton btnCompartir;
 
@@ -124,6 +139,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
             precio = itemView.findViewById(R.id.precioArticulo);
             btnEditar = itemView.findViewById(R.id.edit_btn);
             btnAddToCart = itemView.findViewById(R.id.add_to_cart_btn);
+            imageView = itemView.findViewById(R.id.imagenLista);
 //            btnEliminar = itemView.findViewById(R.id.btnBorrar);
 //            btnCompartir = itemView.findViewById(R.id.btnCompartir);
         }

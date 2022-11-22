@@ -1,20 +1,26 @@
 package com.example.parcial_1;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,29 +33,36 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.bumptech.glide.Glide;
 import com.example.parcial_1.databinding.FragmentSecondBinding;
 import com.example.parcial_1.entities.Producto;
 import com.example.parcial_1.viewmodels.ProductViewModel;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 public class SecondFragment extends Fragment {
 
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    public static final int REQUEST_IMAGE_CAPTURE = 1;
+    public static final int REQUEST_GALLERY = 2;
+    public static final int REQUEST_FILE = 3;
     public static final int REQUEST_IMAGE_PERM = 101;
     private FragmentSecondBinding binding;
     private ProductViewModel productViewModel;
     private Boolean isEditing = false;
-    private Producto item = new Producto();;
+    private Producto item;
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
-    private Bitmap image;
-    String currentPhotoPath;
+    private Uri image;
+
 
     @Override
     public View onCreateView(
@@ -57,21 +70,23 @@ public class SecondFragment extends Fragment {
             Bundle savedInstanceState
     ) {
 
-
-
         binding = FragmentSecondBinding.inflate(inflater, container, false);
         return binding.getRoot();
 
     }
 
+
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        Log.d("fragLifecycle", "onViewCreated: Segundo fragment iniciado");
         productViewModel = new ViewModelProvider(this).get(ProductViewModel.class);
+
+        item = new Producto();
 
         if (getArguments() != null) {
             isEditing = true;
             item = (Producto) getArguments().getSerializable("selectedItem");
+            Log.d("item", "onViewCreated: " + item.getImageUrl());
             binding.inputNombre.setText(item.getNombre());
             binding.inputDescripcion.setText(item.getDescripcion());
 
@@ -79,6 +94,10 @@ public class SecondFragment extends Fragment {
             df.setMaximumFractionDigits(2);
             String precioStr = df.format(item.getPrecio());
             binding.inputPrecio.setText(precioStr);
+
+            if(!Objects.equals(item.getImageUrl(), "")){
+                Glide.with(view.getContext()).load(item.getImageUrl()).into(binding.vistaImagen);
+            }
         }
 
         if(isEditing){
@@ -110,43 +129,15 @@ public class SecondFragment extends Fragment {
             }
         });
 
-
-//        binding.btnRegresar.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                NavHostFragment.findNavController(SecondFragment.this)
-//                        .navigate(R.id.action_SecondFragment_to_FirstFragment);
-//            }
-//        });
-
         binding.vistaImagen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                builder.setTitle("Choose your category picture");
-                builder.setItems(new CharSequence[]
-                                {"Take photo", "Choose from gallery", "Choose from file", "Cancel"},
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // The 'which' argument contains the index position
-                                // of the selected item
-                                switch (which) {
-                                    case 0:
-                                        askPermissions();
-                                        break;
-                                    case 1:
-                                        Toast.makeText(v.getContext(), "clicked 2", Toast.LENGTH_SHORT).show();
-                                        break;
-                                    case 2:
-                                        Toast.makeText(v.getContext(), "clicked 3", Toast.LENGTH_SHORT).show();
-                                        break;
-                                    case 3:
-                                        dialog.cancel();
-                                        break;
-                                }
-                            }
-                        });
-                builder.create().show();
+
+                if(hasPermissions()){
+                    startPictureDialog();
+                }else{
+                    askPermissions();
+                }
 
             }
         });
@@ -157,6 +148,7 @@ public class SecondFragment extends Fragment {
                 clearInputs();
             }
         });
+
 
         binding.btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,17 +178,48 @@ public class SecondFragment extends Fragment {
                 Double precio = Double.parseDouble(precioArticulo);
                 item.setPrecio(precio);
 
-                save(view, item);
+                if(image != null){
+                    uploadToFirebase(image);
+                }else{
+                    save(item);
+                }
 
                 if(!isEditing){
                     clearInputs();
                 }
 
-//                MainActivity.productos.add(nuevoProducto);
 
 
             }
         });
+    }
+
+    private void uploadToFirebase(Uri imageUri) {
+
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "." + getFileExt(imageUri);
+
+        StorageReference fileRef = mStorageRef.child("Images/" + imageFileName);
+        fileRef.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Log.d("item", "getDownloadUrl: " + uri.toString());
+                        item.setImageUrl(uri.toString());
+                        save(item);
+                    }
+                });
+                Toast.makeText(getContext(), "Uploaded succesfully", Toast.LENGTH_LONG).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getContext(), "Uploading Failed", Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 
     @Override
@@ -204,40 +227,83 @@ public class SecondFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK){
-            File f = new File(currentPhotoPath);
-            binding.vistaImagen.setImageURI(Uri.fromFile(f));
+            binding.vistaImagen.setImageURI(image);
         }
+
+        if(requestCode == REQUEST_GALLERY && resultCode == RESULT_OK && data != null){
+            image = data.getData();
+            binding.vistaImagen.setImageURI(image);
+        }
+
+        if(requestCode == REQUEST_FILE && resultCode == RESULT_OK && data != null){
+            image = data.getData();
+            binding.vistaImagen.setImageURI(image);
+        }
+    }
+
+    private String getFileExt(Uri contentUri) {
+        ContentResolver c = getContext().getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(c.getType(contentUri));
     }
 
     @Override
     public void onDestroyView() {
+        Log.d("fragLifecycle", "onDestroyView: Segundo fragment destruido");
+        Log.d("item", "onViewCreated: " + item.getImageUrl());
         super.onDestroyView();
         binding = null;
     }
 
-    private void save(View view, Producto newProduct){
 
+    private void startPictureDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Choose your category picture");
+        builder.setItems(new CharSequence[]
+                        {"Take photo", "Choose from gallery", "Choose from file", "Cancel"},
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // The 'which' argument contains the index position
+                        // of the selected item
+                        switch (which) {
+                            case 0:
+                                dispatchTakePictureIntent();
+                                break;
+                            case 1:
+                                dispatchTakeFromGalleryIntent();
+                                break;
+                            case 2:
+                                dispatchTakeFromFilesIntent();
+                                break;
+                            case 3:
+                                dialog.cancel();
+                                break;
+                        }
+                    }
+                });
+        builder.create().show();
+    }
+
+    private void save(Producto newProduct){
+
+        Log.d("item", "save: " + newProduct.getImageUrl());
         if(isEditing){
             productViewModel.update(newProduct);
-            Toast.makeText(view.getContext(), "Producto actualizado!!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Producto actualizado!!", Toast.LENGTH_LONG).show();
         }else {
             productViewModel.insert(newProduct);
-            Toast.makeText(view.getContext(), "Producto Agregado!!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Producto Agregado!!", Toast.LENGTH_LONG).show();
         }
-
-        isEditing = false;
 
     }
 
 
 
     private void clearInputs(){
+        binding.vistaImagen.setImageResource(R.drawable.ic_baseline_image_search_24);
         binding.inputNombre.setText("");
         binding.inputDescripcion.setText("");
         binding.inputPrecio.setText("");
-
-        binding.inputNombre.requestFocus();
-
 
         binding.btnDelete.setVisibility(View.GONE);
 
@@ -256,15 +322,14 @@ public class SecondFragment extends Fragment {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
+
+        // Save a file: path for use with ACTION_VIEW intents
+
+        return File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        currentPhotoPath = image.getAbsolutePath();
-        return image;
     }
 
     private void dispatchTakePictureIntent() {
@@ -281,34 +346,72 @@ public class SecondFragment extends Fragment {
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(getContext(),
+                image = FileProvider.getUriForFile(getContext(),
                         "com.example.android.fileprovider",
                         photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, image);
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
         }
     }
 
+    private void dispatchTakeFromGalleryIntent(){
+        Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(gallery, REQUEST_GALLERY);
+
+    }
+
+    private void dispatchTakeFromFilesIntent(){
+        Intent fileIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        fileIntent.setType("image/*");
+        startActivityForResult(fileIntent, REQUEST_FILE);
+
+    }
+
+    private boolean hasPermissions(){
+        return (
+                ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+    }
+
     private void askPermissions(){
-        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-        ){
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    REQUEST_IMAGE_PERM);
-        }else{
-            dispatchTakePictureIntent();
-        }
+        Log.d("perm", "askPermissions: asking");
+        requestPermissions(
+                new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE},
+                REQUEST_IMAGE_PERM);
+
+
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//            return;
+//        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            requestPermissions(
+//                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//                    REQUEST_PERMISSIONS_CODE_WRITE_STORAGE
+//            );
+//        }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.d("perm", permissions[0] + " => " + grantResults[0]);
+        Log.d("perm", permissions[1] + " => " + grantResults[1]);
        if(requestCode == REQUEST_IMAGE_PERM){
-           if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-               dispatchTakePictureIntent();
+           if (grantResults.length > 0 &&
+               grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+               grantResults[1] == PackageManager.PERMISSION_GRANTED
+           ){
+               startPictureDialog();
            }
        }
     }
+
+//    private boolean hasWriteStoragePermission(){
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//            return true;
+//        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            return ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+//        }
+//        return true;
+//    }
 }

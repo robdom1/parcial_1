@@ -14,7 +14,7 @@ import com.example.parcial_1.entities.Producto;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Producto.class}, version = 1, exportSchema = false)
+@Database(entities = {Producto.class}, version = 2, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     private static String NAME = "pucmm";
     private static volatile AppDatabase INSTANCE;
